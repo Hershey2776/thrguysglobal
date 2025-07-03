@@ -88,7 +88,7 @@ export default function HeroSection() {
             whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(139, 92, 246, 0.3)" }}
             whileTap={{ scale: 0.95 }}
             className="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl transition-all duration-300"
-            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => window.open("https://calendly.com/hershey-theguysglobal/30min", "_blank")}
           >
             Book Free Consultation
           </motion.button>
