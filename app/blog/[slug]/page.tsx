@@ -1,14 +1,20 @@
-"use client"
-
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import { Calendar, User, Clock, ArrowLeft, Share2, Twitter, Linkedin, Facebook, ArrowRight } from "lucide-react"
-import Navigation from "../../components/navigation"
 import Link from "next/link"
+import { Calendar, User, Clock, ArrowLeft } from "lucide-react"
+import Navigation from "../../components/navigation"
 
 // This would typically come from a CMS or API
 const getBlogPost = (slug: string) => {
-  const posts = {
+  const posts: Record<string, {
+    title: string;
+    excerpt: string;
+    content: string;
+    category: string;
+    author: string;
+    date: string;
+    readTime: string;
+    image: string;
+    tags: string[];
+  }> = {
     "vasp-licensing-2024-guide": {
       title: "VASP Licensing in 2024: The Complete Founder's Guide to Not Getting Rekt",
       excerpt:
@@ -574,9 +580,6 @@ const relatedPosts = [
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = getBlogPost(params.slug)
-  const contentRef = useRef(null)
-  const isContentInView = useInView(contentRef, { once: true, margin: "-100px" })
-
   if (!post) {
     return (
       <div className="bg-black text-white min-h-screen flex items-center justify-center">
@@ -589,186 +592,103 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       </div>
     )
   }
-
   return (
     <div className="bg-black text-white overflow-x-hidden">
       <Navigation />
-
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-black to-gray-900">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
-            <Link
-              href="/blog"
-              className="inline-flex items-center text-purple-400 hover:text-purple-300 mb-8 transition-colors"
-            >
-              <ArrowLeft size={20} className="mr-2" />
-              Back to Blog
-            </Link>
-
-            <div className="mb-6">
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 rounded-full text-sm font-bold">
-                {post.category}
-              </span>
+          <Link
+            href="/blog"
+            className="inline-flex items-center text-purple-400 hover:text-purple-300 mb-8 transition-colors"
+          >
+            <ArrowLeft size={20} className="mr-2" />
+            Back to Blog
+          </Link>
+          <div className="mb-6">
+            <span className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 rounded-full text-sm font-bold">
+              {post.category}
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">{post.title}</h1>
+          <p className="text-xl text-gray-300 mb-8 leading-relaxed">{post.excerpt}</p>
+          <div className="flex flex-wrap items-center gap-6 text-gray-400 mb-8">
+            <div className="flex items-center gap-2">
+              <User size={16} />
+              {post.author}
             </div>
-
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">{post.title}</h1>
-
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">{post.excerpt}</p>
-
-            <div className="flex flex-wrap items-center gap-6 text-gray-400 mb-8">
-              <div className="flex items-center gap-2">
-                <User size={16} />
-                {post.author}
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar size={16} />
-                {new Date(post.date).toLocaleDateString()}
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock size={16} />
-                {post.readTime}
-              </div>
+            <div className="flex items-center gap-2">
+              <Calendar size={16} />
+              {new Date(post.date).toLocaleDateString()}
             </div>
-
-            {/* Social Share */}
-            <div className="flex items-center gap-4 mb-8">
-              <span className="text-gray-400">Share:</span>
-              <div className="flex gap-3">
-                <button className="p-2 bg-gray-800/50 rounded-full hover:bg-gray-700/50 transition-colors">
-                  <Twitter size={16} />
-                </button>
-                <button className="p-2 bg-gray-800/50 rounded-full hover:bg-gray-700/50 transition-colors">
-                  <Linkedin size={16} />
-                </button>
-                <button className="p-2 bg-gray-800/50 rounded-full hover:bg-gray-700/50 transition-colors">
-                  <Facebook size={16} />
-                </button>
-                <button className="p-2 bg-gray-800/50 rounded-full hover:bg-gray-700/50 transition-colors">
-                  <Share2 size={16} />
-                </button>
-              </div>
+            <div className="flex items-center gap-2">
+              <Clock size={16} />
+              {post.readTime}
             </div>
-
-            <div className="relative h-64 md:h-96 rounded-2xl overflow-hidden mb-12">
-              <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-full object-cover" />
-            </div>
-          </motion.div>
+          </div>
         </div>
       </section>
-
-      {/* Article Content */}
-      <section ref={contentRef} className="py-20 px-6 bg-black">
+      {/* Content Section */}
+      <section className="py-20 px-6 bg-black">
         <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={isContentInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="prose prose-invert prose-lg max-w-none"
-          >
+          <div className="prose prose-invert prose-lg max-w-none">
             <div className="blog-content" dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, "<br />") }} />
-          </motion.div>
-
+          </div>
           {/* Tags */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isContentInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-12 pt-8 border-t border-gray-800"
-          >
+          <div className="mt-12 pt-8 border-t border-gray-800">
             <h3 className="text-lg font-semibold mb-4">Tags</h3>
             <div className="flex flex-wrap gap-3">
-              {post.tags.map((tag) => (
+              {post.tags.map((tag: string) => (
                 <span key={tag} className="bg-gray-800/50 px-3 py-1 rounded-full text-sm text-gray-300">
                   {tag}
                 </span>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
-
       {/* Related Posts */}
       <section className="py-20 px-6 bg-gradient-to-b from-black to-gray-900">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-4xl font-bold mb-12 text-center"
-          >
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Related Articles
-            </span>
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {relatedPosts.map((relatedPost, index) => (
-              <motion.article
-                key={relatedPost.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -10, scale: 1.02 }}
-                className="group"
-              >
-                <Link href={`/blog/${relatedPost.id}`}>
-                  <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 hover:border-gray-600/50 transition-all duration-300 cursor-pointer">
-                    <div className="mb-4">
-                      <span className="bg-gray-700/50 px-3 py-1 rounded-full text-sm text-gray-300">
-                        {relatedPost.category}
-                      </span>
-                    </div>
-
-                    <h3 className="text-xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
-                      {relatedPost.title}
-                    </h3>
-
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">{relatedPost.readTime}</span>
-                      <div className="flex items-center text-purple-400 font-semibold">
-                        Read More
-                        <ArrowRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
-                      </div>
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold mb-8 text-white">Related Articles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {relatedPosts.map((relatedPost) => (
+              <Link key={relatedPost.id} href={`/blog/${relatedPost.id}`}>
+                <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 hover:border-gray-600/50 transition-all duration-300 cursor-pointer">
+                  <div className="mb-4">
+                    <span className="bg-gray-700/50 px-3 py-1 rounded-full text-sm text-gray-300">
+                      {relatedPost.category}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
+                    {relatedPost.title}
+                  </h3>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400">{relatedPost.readTime}</span>
+                    <div className="flex items-center text-purple-400 font-semibold">
+                      Read More
                     </div>
                   </div>
-                </Link>
-              </motion.article>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-6 bg-black">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Ready to Dominate Your Market?
-              </span>
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Stop reading about success. Start creating it. Let's turn your ambitious vision into market reality.
-            </p>
-
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 25px 50px rgba(139, 92, 246, 0.4)" }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 px-10 py-4 rounded-full text-lg font-bold hover:shadow-2xl transition-all duration-300"
-            >
-              Book Free Consultation
-            </motion.button>
-          </motion.div>
-        </div>
-      </section>
     </div>
   )
+}
+
+// Add this at the bottom of the file for static export
+export async function generateStaticParams() {
+  return [
+    { slug: "vasp-licensing-2024-guide" },
+    { slug: "ugc-content-strategy-2024" },
+    { slug: "hiring-elite-talent-startup" },
+    { slug: "product-market-fit-myths" },
+    { slug: "crisis-management-playbook" },
+    { slug: "fintech-regulatory-trends-2024" },
+    { slug: "scaling-operations-zero-to-unicorn" },
+    { slug: "viral-marketing-psychology" },
+  ];
 }
